@@ -1,5 +1,5 @@
 class Ray {
-    constructor(pos, degree, intersection){
+    constructor(pos, degree, intersection, color){
         this.source = {
             x: pos.x,
             y: pos.y
@@ -8,16 +8,19 @@ class Ray {
             x: pos.x + Math.cos(degree * Math.PI / 180),
             y: pos.y - Math.sin(degree * Math.PI / 180)
         };
-        this.intersection = {
-            x: intersection.x,
-            y: intersection.y
+        this.degree = degree;
+        this.intersection = intersection || {
+            x: 0,
+            y: 0
         }
+        this.color = color || "white";
     }
 
-    static getPlayerRays(playerPos){
+    static getPlayerRays(player){
         let playerRays = [];
-        for(let i=0; i<360 ; i+=5){
-            let newRay = new Ray(playerPos, i, {x:Math.random()*100, y:Math.random()*100});
+        let fov = player.rotation + player.fov;
+        for(let i=player.rotation; i<fov ; i+=0.25){
+            let newRay = new Ray(player.position, i);
             playerRays.push(newRay);
         }
         return playerRays;
@@ -32,12 +35,10 @@ class Ray {
             walls.forEach((wall) => {
                 let walldx = wall.endPos.x - wall.startPos.x;
                 let walldy = wall.endPos.y - wall.startPos.y;
-                
                 let wallRaydx = ray.source.x - wall.startPos.x;
                 let wallRaydy = ray.source.y - wall.startPos.y;
 
                 let d = walldx * raydy - walldy * raydx;
-
 
                 // d=0 means they are parallel
                 if(d === 0) return;
@@ -49,7 +50,6 @@ class Ray {
 
                 // n1/d has to be less than 1, else intersection is outside wall segment
                 if(n1>0 && n1>d || n1<0 && n1<d) return;
-
 
                 let n2 = wallRaydx * walldy - wallRaydy * walldx;
 
@@ -73,17 +73,12 @@ class Ray {
 
                 ray.intersection.x = intersectionX;
                 ray.intersection.y = intersectionY;
-
+                ray.color = wall.color;
                 distance = newDistance;
-
-                // console.log(ray);
-
-                // intersectedRays.push(ray);
             })
             intersectedRays.push(ray);
         })
-        // console.log("player rays: " + rays.length + " - intersected rays: " + intersectedRays.length);
-        // console.log(intersectedRays);
+        
         return intersectedRays;
     }
 }

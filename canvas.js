@@ -32,25 +32,57 @@ class Canvas {
     }
 
     drawRays(rays){
-        this.context.strokeStyle = "rgba(255,255,255,1)";
-        
-        this.context.lineWidth = 1;
-        rays.forEach((ray) => {
+        this.context.strokeStyle = "white";
+        this.context.lineWidth = 2;
+
+        let ray = {};
+        for(let i=0; i<rays.length; i+=10){
+            ray = rays[i]
+            this.context.strokeStyle = ray.color;
             this.context.beginPath();
             this.context.moveTo(ray.source.x, ray.source.y);
             this.context.lineTo(ray.intersection.x, ray.intersection.y);
             this.context.stroke();
         }
-        )
+        // rays.forEach((ray) => {
+        //     this.context.strokeStyle = ray.color;
+        //     this.context.beginPath();
+        //     this.context.moveTo(ray.source.x, ray.source.y);
+        //     this.context.lineTo(ray.intersection.x, ray.intersection.y);
+        //     this.context.stroke();
+        // }
+        // )
     }
 
     drawWalls(walls){
         this.context.strokeStyle = "white";
+        this.context.lineWidth = 2;
         walls.forEach((wall) => {
+            this.context.strokeStyle = wall.color;
             this.context.beginPath();
             this.context.moveTo(wall.startPos.x, wall.startPos.y);
             this.context.lineTo(wall.endPos.x, wall.endPos.y);
             this.context.stroke();
+        })
+    }
+
+    drawPovCeilFloor(ceilColor, floorColor){
+        let midHeight = this.canvas.height/2
+        this.context.fillStyle = ceilColor;
+        this.context.fillRect(0, 0, this.canvas.width, midHeight);
+        this.context.fillStyle = floorColor;
+        this.context.fillRect(0, midHeight, this.canvas.width, this.canvas.height);
+    }
+
+    drawPovWalls(povWalls){
+        this.context.fillStyle = "white";
+        // this.context.lineWidth = 0;
+        let width = Math.ceil(this.canvas.width/povWalls.length);
+        let midHeight = this.canvas.height / 2;
+        let pos = this.canvas.width;
+        povWalls.forEach((wall) => {
+            this.context.fillStyle = wall.color;
+            this.context.fillRect(pos-=width, midHeight-wall.height/2, width , wall.height);
         })
     }
 }
